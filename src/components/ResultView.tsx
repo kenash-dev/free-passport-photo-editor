@@ -16,6 +16,8 @@ interface Props {
 }
 
 const ICON = { pass: '✓', warn: '!', fail: '✕' };
+// 300 DPI keeps A4/Letter sheets under mobile Safari's canvas size limit.
+const SHEET_DPI = 300;
 
 function Slider(props: { label: string; value: number; min: number; max: number; step: number; fmt: (v: number) => string; onChange: (v: number) => void }) {
   return (
@@ -32,6 +34,7 @@ export function ResultView({ country, bitmap, face, layout, canvas, checks, adju
   const [guides, setGuides] = useState(true);
   const [paperId, setPaperId] = useState('4x6');
   const [busy, setBusy] = useState<string | null>(null);
+  const [error, setError] = useState<string | null>(null);
   const { frame } = layout;
   const tag = country.id.toUpperCase();
 
@@ -47,8 +50,12 @@ export function ResultView({ country, bitmap, face, layout, canvas, checks, adju
 
   async function run(label: string, fn: () => Promise<void>) {
     setBusy(label);
+    setError(null);
     try {
       await fn();
+    } catch (e) {
+      console.error(e);
+      setError('The download couldn’t be created on this device. Try a smaller paper size.');
     } finally {
       setBusy(null);
     }
@@ -159,8 +166,8 @@ export function ResultView({ country, bitmap, face, layout, canvas, checks, adju
                 disabled={!!busy || sheetCount === 0}
                 onClick={() =>
                   run('sheet', async () => {
-                    const { canvas: sheet } = renderSheet(canvas, frame, paper, frame.dpi ?? 300);
-                    const blob = await encodeJpeg(sheet, { dpi: frame.dpi });
+                    const { canvas: sheet } = renderSheet(canvas, frame, paper, SHEET_DPI);
+                    const blob = await encodeJpeg(sheet, { dpi: SHEET_DPI });
                     download(blob, `passport-photo-sheet-${tag}-${paper.id}-${sheetCount}x.jpg`);
                   })
                 }
@@ -170,6 +177,7 @@ export function ResultView({ country, bitmap, face, layout, canvas, checks, adju
             </div>
             <p className="muted small">Print at 100% / “actual size”, not “fit to page”, or the photos will come out the wrong size.</p>
             {busy && <p className="muted small">Preparing download…</p>}
+            {error && <p className="error">{error}</p>}
           </div>
         </div>
       </div>

@@ -117,7 +117,7 @@ export function computeLayout(c: CountrySpec, face: FaceInfo, frame: Frame, adju
   const tol = 2;
   const corners = [toSrc(0, 0), toSrc(frame.widthPx, 0), toSrc(0, frame.heightPx), toSrc(frame.widthPx, frame.heightPx)];
   const missingEdges: string[] = [];
-  if (corners.slice(0, 2).some((p) => p.y < -tol || p.x < -tol || p.x > src.width + tol)) missingEdges.push('top');
+  if (corners.slice(0, 2).some((p) => p.y < -tol)) missingEdges.push('top');
   if (corners.some((p) => p.x < -tol || p.x > src.width + tol)) missingEdges.push('sides');
   if (corners.slice(2).some((p) => p.y > src.height + tol)) missingEdges.push('bottom');
 
