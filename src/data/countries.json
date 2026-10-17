@@ -1,0 +1,176 @@
+{
+  "version": 1,
+  "verified": "2026-10-16",
+  "notes": "Every value comes from the entry's sources. null means the official source does not state it. Fields under appDefaults are choices the app makes where the source is silent, not official values.",
+  "countries": [
+    {
+      "id": "us",
+      "name": "United States",
+      "document": "passport",
+      "photo": { "widthMm": 50.8, "heightMm": 50.8, "widthMmMax": null, "heightMmMax": null },
+      "head": { "chinToCrownMm": [25, 35], "faceHeightRatio": null },
+      "eyeLine": { "fromBottomMm": null },
+      "background": { "allowed": ["white", "off-white"], "color": "#FFFFFF" },
+      "maxAgeMonths": 6,
+      "digital": {
+        "aspect": "1:1",
+        "widthPx": null, "heightPx": null,
+        "minPx": null, "maxPx": null,
+        "fileKB": [54, 10240],
+        "formats": ["jpg", "jpeg", "png", "heic", "heif"]
+      },
+      "rules": {
+        "glasses": "not-allowed",
+        "glassesException": "medical, with signed doctor's note",
+        "smile": "allowed-mouth-closed",
+        "headCovering": "religious or medical only, with signed statement; full face visible, one colour, no pattern",
+        "other": ["No uniforms, camouflage, headphones", "No edits, filters or apps", "Photo paper, matte or glossy; no scans or photocopies"]
+      },
+      "appDefaults": { "dpi": 600, "eyeLineFromBottomMm": [28, 35] },
+      "sources": [
+        "https://travel.state.gov/content/travel/en/passports/how-apply/photos.html",
+        "https://travel.state.gov/en/passports/renew-replace/online/upload-digital-photo.html"
+      ]
+    },
+    {
+      "id": "gb",
+      "name": "United Kingdom",
+      "document": "passport",
+      "photo": { "widthMm": 35, "heightMm": 45, "widthMmMax": null, "heightMmMax": null },
+      "head": { "chinToCrownMm": [29, 34], "faceHeightRatio": null },
+      "eyeLine": { "fromBottomMm": null },
+      "background": { "allowed": ["cream", "light grey"], "color": "#EEEEEE" },
+      "maxAgeMonths": 1,
+      "digital": {
+        "aspect": "4:5",
+        "widthPx": null, "heightPx": null,
+        "minPx": [600, 750], "maxPx": null,
+        "fileKB": [50, 10240],
+        "formats": null
+      },
+      "rules": {
+        "glasses": "discouraged",
+        "glassesException": "only if needed; no sunglasses or tint; frames and glare must not cover eyes",
+        "smile": "not-allowed",
+        "headCovering": "religious or medical only",
+        "other": ["Printed: 2 identical photos on plain white photo paper, no border, not cut down from a larger picture", "Digital: do not crop; show head, shoulders and upper body", "Under 6: plain expression not required; under 1: eyes may be closed"]
+      },
+      "appDefaults": { "dpi": 600, "digitalExportPx": [900, 1200] },
+      "sources": [
+        "https://www.gov.uk/photos-for-passports/photo-requirements",
+        "https://www.gov.uk/photos-for-passports"
+      ]
+    },
+    {
+      "id": "au",
+      "name": "Australia",
+      "document": "passport",
+      "photo": { "widthMm": 35, "heightMm": 45, "widthMmMax": 40, "heightMmMax": 50 },
+      "head": { "chinToCrownMm": [32, 36], "faceHeightRatio": null },
+      "eyeLine": { "fromBottomMm": null },
+      "background": { "allowed": ["white", "light grey"], "color": "#FFFFFF" },
+      "maxAgeMonths": 6,
+      "digital": null,
+      "rules": {
+        "glasses": "not-allowed",
+        "glassesException": "only if they can't be removed for medical reasons",
+        "smile": "not-allowed",
+        "headCovering": "religious only, plain with no pattern",
+        "other": ["Printed on heavy glossy paper, at least 200 gsm", "Under 3: open mouth acceptable", "Online photo services and apps are not recommended by the Passport Office"]
+      },
+      "appDefaults": { "dpi": 600 },
+      "sources": [
+        "https://www.passports.gov.au/passport-photos",
+        "https://passports.gov.au/files/brochure-general-photo-guidelines"
+      ]
+    },
+    {
+      "id": "nz",
+      "name": "New Zealand",
+      "document": "passport",
+      "photo": null,
+      "head": { "chinToCrownMm": null, "faceHeightRatio": null },
+      "eyeLine": { "fromBottomMm": null },
+      "background": { "allowed": ["plain light colour"], "color": "#F2F2F2" },
+      "maxAgeMonths": 6,
+      "digital": {
+        "aspect": "3:4",
+        "widthPx": null, "heightPx": null,
+        "minPx": [900, 1200], "maxPx": [4500, 6000],
+        "fileKB": [250, 5120],
+        "formats": ["jpg", "jpeg"]
+      },
+      "rules": {
+        "glasses": "allowed",
+        "glassesException": "prescription only; not tinted or thick-framed; no glare; no sunglasses",
+        "smile": "not-allowed-mouth-closed",
+        "headCovering": "religious or medical only",
+        "other": ["Clear gap around sides and top of head; shoulders and upper chest included", "Scans of printed photos not accepted", "Official online photo checker exists; use it as a reference test"]
+      },
+      "appDefaults": { "digitalExportPx": [1200, 1600], "printedMm": [35, 45] },
+      "sources": [
+        "https://www.passports.govt.nz/passport-photos",
+        "https://www.passports.govt.nz/passport-photos/check-your-photo-meets-the-technical-requirements"
+      ]
+    },
+    {
+      "id": "in",
+      "name": "India",
+      "document": "passport",
+      "photo": null,
+      "head": { "chinToCrownMm": null, "faceHeightRatio": [0.80, 0.85] },
+      "eyeLine": { "fromBottomMm": null },
+      "background": { "allowed": ["white"], "color": "#FFFFFF" },
+      "maxAgeMonths": null,
+      "digital": {
+        "aspect": "7:9",
+        "widthPx": 630, "heightPx": 810,
+        "minPx": null, "maxPx": null,
+        "fileKB": null,
+        "formats": null
+      },
+      "rules": {
+        "glasses": "not-allowed",
+        "glassesException": null,
+        "smile": "natural-mouth-closed",
+        "headCovering": "religious only; chin to forehead and both face edges visible",
+        "other": ["ICAO-compliant guidelines enforced by missions from 1 Dec 2025 (Bern notice)", "Close-up of head and top of shoulders", "Uniform lighting, no shadows, flash reflections or red eye", "No software edits"]
+      },
+      "appDefaults": { "printedMm": [35, 45], "dpi": 457 },
+      "sources": [
+        "https://mportal.passportindia.gov.in/pdf/Guidelines_for_ICAO_Compliant_Photographs_for_Passport_Applications.pdf",
+        "https://www.indembassybern.gov.in/page/notice-reg-icao-photo-requirements/"
+      ]
+    },
+    {
+      "id": "in-oci",
+      "name": "India (OCI card)",
+      "document": "oci",
+      "photo": { "widthMm": 51, "heightMm": 51, "widthMmMax": null, "heightMmMax": null },
+      "head": { "chinToCrownMm": null, "faceHeightRatio": [0.80, 0.80] },
+      "eyeLine": { "fromBottomMm": null },
+      "background": { "allowed": ["plain light colour, not white"], "color": "#E8E8E8" },
+      "maxAgeMonths": null,
+      "digital": {
+        "aspect": "1:1",
+        "widthPx": null, "heightPx": null,
+        "minPx": [360, 360], "maxPx": [900, 900],
+        "fileKB": [null, 200],
+        "formats": ["jpg", "jpeg"]
+      },
+      "rules": {
+        "glasses": null,
+        "glassesException": null,
+        "smile": null,
+        "headCovering": null,
+        "other": ["Square, not less than 51x51 mm, no border", "Full face front view, centred, head and shoulders", "Printed photo must match the uploaded one; not stapled, not signed", "Digital limits vary by mission (see doc); minPx/maxPx/fileKB here are the strictest found"]
+      },
+      "appDefaults": { "dpi": 600, "digitalExportPx": [600, 600], "maxExportKB": 200 },
+      "sources": [
+        "https://indembassysweden.gov.in/page/oci-cards",
+        "https://www.hciwellington.gov.in/page/new-fresh-oci-card/",
+        "https://www.indianembassynetherlands.gov.in/content/OCI-Checklist-20260217-NEW_1.pdf"
+      ]
+    }
+  ]
+}
