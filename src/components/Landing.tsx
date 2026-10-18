@@ -1,6 +1,6 @@
 import faq from '../data/faq.json';
 
-export const REPO_URL = 'https://github.com/kenash-dev/on-browser-passport-photo';
+export const REPO_URL = 'https://github.com/kenash-dev/free-passport-photo-editor';
 
 function GitHubMark() {
   return (

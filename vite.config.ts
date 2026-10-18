@@ -3,9 +3,9 @@ import react from '@vitejs/plugin-react';
 import faq from './src/data/faq.json';
 
 // GitHub Pages serves the site from /<repo>/; override with BASE_PATH and SITE_URL for other hosts.
-const base = process.env.BASE_PATH ?? '/on-browser-passport-photo/';
+const base = process.env.BASE_PATH ?? '/free-passport-photo-editor/';
 const siteUrl = process.env.SITE_URL ?? `https://kenash-dev.github.io${base}`;
-const repoUrl = 'https://github.com/kenash-dev/on-browser-passport-photo';
+const repoUrl = 'https://github.com/kenash-dev/free-passport-photo-editor';
 
 /** Adds the canonical URL and structured data (web app + FAQ) so search engines see them without running JS. */
 function seo(): Plugin {

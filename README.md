@@ -2,7 +2,7 @@
 
 **A free passport photo editor that runs entirely in your browser. Your photo is never uploaded.**
 
-👉 **Use it now: https://kenash-dev.github.io/on-browser-passport-photo/**
+👉 **Use it now: https://kenash-dev.github.io/free-passport-photo-editor/**
 
 Pick your country, add one photo, and get a correctly sized passport photo, ready to print or to submit with an online application. There's no sign-up, no watermark and no payment.
 
@@ -57,13 +57,13 @@ The code for these steps is in [`src/lib/`](src/lib): `upload.ts`, `face.ts`, `s
 You need [Node.js](https://nodejs.org/) 20 or newer.
 
 ```bash
-git clone https://github.com/kenash-dev/on-browser-passport-photo.git
-cd on-browser-passport-photo
+git clone https://github.com/kenash-dev/free-passport-photo-editor.git
+cd free-passport-photo-editor
 npm install
 npm run dev
 ```
 
-Then open the address it prints (usually http://localhost:5173/on-browser-passport-photo/).
+Then open the address it prints (usually http://localhost:5173/free-passport-photo-editor/).
 
 To run the unit tests:
 
