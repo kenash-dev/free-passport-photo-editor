@@ -220,7 +220,8 @@ function replaceBackground(canvas: HTMLCanvasElement, layout: Layout, mask: HTML
   ctx.restore();
 }
 
-export type CheckLevel = 'pass' | 'warn' | 'fail';
+/** fail: can't be used; warn: may be rejected; pass: meets a rule; info: what the app adjusted, nothing wrong. */
+export type CheckLevel = 'pass' | 'warn' | 'fail' | 'info';
 export interface Check {
   level: CheckLevel;
   text: string;
@@ -235,7 +236,8 @@ export function checkResult(faces: FaceInfo[], layout: Layout | null, background
   const face = faces[0];
 
   const deg = Math.abs((layout?.angle ?? 0) * 180) / Math.PI;
-  checks.push(deg > 1 ? { level: 'pass', text: `Straightened by ${round1(deg)}°` } : { level: 'pass', text: 'Head is level' });
+  checks.push({ level: 'pass', text: 'Head is level' });
+  if (deg > 1) checks.push({ level: 'info', text: `Straightened by ${round1(deg)}°` });
 
   const dl = Math.hypot(face.noseTip.x - face.cheekLeft.x, face.noseTip.y - face.cheekLeft.y);
   const dr = Math.hypot(face.noseTip.x - face.cheekRight.x, face.noseTip.y - face.cheekRight.y);
@@ -260,24 +262,24 @@ export function checkResult(faces: FaceInfo[], layout: Layout | null, background
       const ok = e >= layout.eyeRangeMm[0] && e <= layout.eyeRangeMm[1];
       checks.push({ level: ok ? 'pass' : 'warn', text: `Eye line ${round1(e)} mm from bottom (allowed ${layout.eyeRangeMm[0]}–${layout.eyeRangeMm[1]} mm)` });
     }
-    if (layout.scale > 1.05) {
-      checks.push({ level: 'warn', text: 'The face is small in this photo, so it was enlarged and may look soft. Move closer or use a sharper photo.' });
+    // Mild enlargement is normal and barely visible; only strong enlargement risks a soft photo.
+    if (layout.scale > 1.6) {
+      checks.push({ level: 'warn', text: 'The face is small in this photo, so it was enlarged a lot and may look soft. A closer or sharper photo will look better.' });
+    } else if (layout.scale > 1.05) {
+      checks.push({ level: 'info', text: 'Enlarged slightly to reach the required head size' });
     }
     if (face.crownCut) {
       checks.push({ level: 'warn', text: 'The top of the head is cut off in this photo, so head height is estimated. Use a photo with space above your hair.' });
     } else if (layout.crownEstimated) {
-      checks.push({ level: 'warn', text: 'Couldn’t find the top of the head against the background, so it is estimated. Check the dashed line sits on top of your hair.' });
+      checks.push({ level: 'info', text: 'Top of head estimated. Check the dashed line sits on top of your hair.' });
     }
-    if (backgroundReplaced) checks.push({ level: 'pass', text: 'Background replaced with the required colour' });
+    if (backgroundReplaced) checks.push({ level: 'info', text: 'Background replaced with the required colour' });
     // With a new background, only a missing bottom (cut-off shoulders) is visible in the result.
     const missing = backgroundReplaced ? layout.missingEdges.filter((e) => e === 'bottom') : layout.missingEdges;
     if (missing.length) {
-      checks.push({
-        level: 'warn',
-        text: `The photo doesn't reach the ${missing.join(' and ')} of the frame, so it was extended. Check the edges look natural, or drag the photo.`,
-      });
+      checks.push({ level: 'info', text: `Filled in the ${missing.join(' and ')} edge, where your photo ended. Drag the photo if it doesn't look natural.` });
     }
   }
-  const order: Record<CheckLevel, number> = { fail: 0, warn: 1, pass: 2 };
+  const order: Record<CheckLevel, number> = { fail: 0, warn: 1, pass: 2, info: 3 };
   return checks.sort((a, b2) => order[a.level] - order[b2.level]);
 }

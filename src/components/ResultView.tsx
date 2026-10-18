@@ -18,7 +18,7 @@ interface Props {
   onReplaceBg: (on: boolean) => void;
 }
 
-const ICON = { pass: '✓', warn: '!', fail: '✕' };
+const ICON = { pass: '✓', warn: '!', fail: '✕', info: 'i' };
 // 300 DPI keeps A4/Letter sheets under mobile Safari's canvas size limit.
 const SHEET_DPI = 300;
 const MAX_MOVE_MM = 10;

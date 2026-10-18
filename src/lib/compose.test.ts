@@ -123,6 +123,14 @@ describe('checkResult', () => {
     expect(checks.every((ch) => ch.level === 'pass')).toBe(true);
   });
 
+  it('reports adjustments as information, not warnings', () => {
+    const c = country('gb');
+    const face = makeFace({ deg: 4, eyeY: 650 });
+    const checks = checkResult([face], computeLayout(c, face, printFrame(c)!, NO_ADJUST, PHOTO), true);
+    expect(checks.some((ch) => ch.level === 'warn' || ch.level === 'fail')).toBe(false);
+    expect(checks.filter((ch) => ch.level === 'info').map((ch) => ch.text).join(' ')).toMatch(/Straightened.*Background replaced/);
+  });
+
   it('warns about closed eyes and lists warnings first', () => {
     const c = country('gb');
     const face = { ...makeFace(), blendshapes: { eyeBlinkLeft: 0.9, eyeBlinkRight: 0.9 } };
