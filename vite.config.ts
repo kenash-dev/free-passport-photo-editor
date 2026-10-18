@@ -53,7 +53,31 @@ function seo(): Plugin {
   };
 }
 
+/**
+ * Optional, set as GitHub Actions repository variables:
+ * VITE_CF_BEACON_TOKEN adds Cloudflare Web Analytics (cookieless page-view counts);
+ * GOOGLE_SITE_VERIFICATION adds the Google Search Console ownership tag.
+ */
+function siteServices(): Plugin {
+  const safe = (v: string | undefined) => (v && /^[A-Za-z0-9_-]+$/.test(v) ? v : null);
+  const cfToken = safe(process.env.VITE_CF_BEACON_TOKEN);
+  const googleToken = safe(process.env.GOOGLE_SITE_VERIFICATION);
+  return {
+    name: 'site-services',
+    transformIndexHtml(html) {
+      const tags: string[] = [];
+      if (googleToken) tags.push(`<meta name="google-site-verification" content="${googleToken}" />`);
+      if (cfToken) {
+        tags.push(
+          `<script defer src="https://static.cloudflareinsights.com/beacon.min.js" data-cf-beacon='{"token": "${cfToken}"}'></script>`,
+        );
+      }
+      return tags.length ? html.replace('</head>', `    ${tags.join('\n    ')}\n  </head>`) : html;
+    },
+  };
+}
+
 export default defineConfig({
   base,
-  plugins: [react(), seo()],
+  plugins: [react(), seo(), siteServices()],
 });

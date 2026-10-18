@@ -84,6 +84,11 @@ The built site is in `dist/` and is just static files, so any static host or a l
 
 Every push to `main` runs the tests, builds the site and publishes it to GitHub Pages (see [`.github/workflows/deploy.yml`](.github/workflows/deploy.yml)).
 
+Two optional repository variables (Settings > Secrets and variables > Actions > Variables) are added to the page at build time:
+
+- `CF_BEACON_TOKEN`: turns on [Cloudflare Web Analytics](https://www.cloudflare.com/web-analytics/), which counts page visits without cookies. It never sees photos.
+- `GOOGLE_SITE_VERIFICATION`: the Google Search Console ownership token.
+
 To host it somewhere else, such as Cloudflare Pages or Netlify, build it for the site root:
 
 ```bash

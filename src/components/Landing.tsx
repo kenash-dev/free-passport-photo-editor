@@ -136,6 +136,12 @@ export function PrivacyNote() {
           The whole project is public on GitHub, so anyone can confirm that no photo is sent anywhere, and you can run it on your own
           computer if you prefer.
         </p>
+        {import.meta.env.VITE_CF_BEACON_TOKEN && (
+          <p>
+            To know how many people use the tool, page visits are counted with Cloudflare Web Analytics, which uses no cookies and doesn't
+            track you across sites. It never sees your photo.
+          </p>
+        )}
       </div>
       <a className="btn btn-secondary source-cta" href={REPO_URL} target="_blank" rel="noreferrer">
         <GitHubMark />
