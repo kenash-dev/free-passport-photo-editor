@@ -63,6 +63,12 @@ npm run dev
 
 Then open the address it prints (usually http://localhost:5173/on-browser-passport-photo/).
 
+To run the unit tests:
+
+```bash
+npm test
+```
+
 To build the production version and preview it:
 
 ```bash
@@ -74,7 +80,7 @@ The built site is in `dist/` and is just static files, so any static host or a l
 
 ## Deploying
 
-Every push to `main` builds the site and publishes it to GitHub Pages (see [`.github/workflows/deploy.yml`](.github/workflows/deploy.yml)).
+Every push to `main` runs the tests, builds the site and publishes it to GitHub Pages (see [`.github/workflows/deploy.yml`](.github/workflows/deploy.yml)).
 
 To host it somewhere else, such as Cloudflare Pages or Netlify, build it for the site root:
 
