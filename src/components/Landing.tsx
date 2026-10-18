@@ -18,7 +18,7 @@ export function SiteHeader() {
     <header className="site-head">
       <a className="wordmark" href="./">
         <span className="wordmark-photo" aria-hidden="true" />
-        Passport Photo Maker
+        Free Passport Photo Editor
       </a>
       <a className="source-link" href={REPO_URL} target="_blank" rel="noreferrer">
         <GitHubMark />
@@ -30,7 +30,7 @@ export function SiteHeader() {
 
 /** The machine-readable zone at the foot of a passport's photo page, used as the hero's signature. */
 function Mrz() {
-  const line1 = 'P<FREE<<PASSPORT<PHOTO<MAKER<<<<<<<<<<<<<<<<<';
+  const line1 = 'P<FREE<<PASSPORT<PHOTO<EDITOR<<<<<<<<<<<<<<<<';
   const line2 = 'NO<UPLOAD<<RUNS<IN<YOUR<BROWSER<<OPEN<SOURCE<';
   return (
     <div className="mrz" aria-hidden="true">
@@ -68,7 +68,7 @@ export function Hero() {
       <div className="hero-inner">
         <h1>Make your passport photo without uploading it anywhere.</h1>
         <p className="lede">
-          A free passport photo maker that runs entirely in your browser. Pick your country, add a photo, and get a correctly sized photo
+          A free passport photo editor that runs entirely in your browser. Pick your country, add a photo, and get a correctly sized photo
           ready to print or submit online. Your face never leaves your device.
         </p>
         <ul className="promises">

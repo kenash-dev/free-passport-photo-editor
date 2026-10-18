@@ -13,10 +13,10 @@ function seo(): Plugin {
     {
       '@context': 'https://schema.org',
       '@type': 'WebApplication',
-      name: 'Passport Photo Maker',
+      name: 'Free Passport Photo Editor',
       url: siteUrl,
       description:
-        'Free passport photo maker that runs entirely in your browser. Photos are never uploaded. Supports US, UK, Australia, New Zealand, India passport and OCI sizes.',
+        'Free passport photo editor that runs entirely in your browser. Photos are never uploaded. Supports US, UK, Canada, Australia, New Zealand, India passport and OCI sizes.',
       applicationCategory: 'PhotographyApplication',
       operatingSystem: 'Any (web browser)',
       isAccessibleForFree: true,

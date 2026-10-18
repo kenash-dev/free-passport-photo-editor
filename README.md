@@ -1,6 +1,6 @@
-# Passport Photo Maker
+# Free Passport Photo Editor
 
-**A free passport photo maker that runs entirely in your browser. Your photo is never uploaded.**
+**A free passport photo editor that runs entirely in your browser. Your photo is never uploaded.**
 
 👉 **Use it now: https://kenash-dev.github.io/on-browser-passport-photo/**
 
@@ -23,6 +23,7 @@ Because the code is all here, you can check this for yourself:
 | --- | --- | --- |
 | United States passport | 2 × 2 in (51 × 51 mm) | none stated |
 | United Kingdom passport | 35 × 45 mm | at least 600 × 750 px |
+| Canada passport | 50 × 70 mm | 1200 × 1800 to 3000 × 4500 px (online renewal) |
 | Australia passport | 35–40 × 45–50 mm | none stated |
 | New Zealand passport | digital only | 900 × 1200 to 4500 × 6000 px |
 | India passport | 35 × 45 mm | 630 × 810 px |

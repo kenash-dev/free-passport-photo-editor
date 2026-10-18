@@ -85,6 +85,34 @@
       ]
     },
     {
+      "id": "ca",
+      "name": "Canada",
+      "document": "passport",
+      "photo": { "widthMm": 50, "heightMm": 70, "widthMmMax": null, "heightMmMax": null },
+      "head": { "chinToCrownMm": [31, 36], "faceHeightRatio": null },
+      "eyeLine": { "fromBottomMm": null },
+      "background": { "allowed": ["plain white", "light-coloured"], "color": "#FFFFFF" },
+      "maxAgeMonths": 6,
+      "digital": {
+        "aspect": "2:3",
+        "widthPx": null, "heightPx": null,
+        "minPx": [1200, 1800], "maxPx": [3000, 4500],
+        "fileKB": [200, 5120],
+        "formats": ["jpg", "jpeg"]
+      },
+      "rules": {
+        "glasses": "allowed",
+        "glassesException": "eyes clearly visible, no glare; no sunglasses or tinted lenses",
+        "smile": "not-allowed-mouth-closed",
+        "headCovering": "religious or medical only, worn daily; full face visible, no shadows",
+        "other": ["Must be taken in person by a commercial photographer or photo studio", "Printed: 2 identical photos, professionally printed on plain photo paper; home-printed photos not accepted", "Back of one photo: studio name, full address and date taken; guarantor declaration unless an adult renewal", "Digital (online renewal only): JPEG, 3:2 portrait, 1200 x 1800 to 3000 x 4500 px, 200 KB to 5 MB, head 45-50% of photo height", "No edits, filters, AI tools or red-eye correction"]
+      },
+      "appDefaults": { "dpi": 600, "digitalExportPx": [1200, 1800] },
+      "sources": [
+        "https://www.canada.ca/en/immigration-refugees-citizenship/services/canadian-passports/photos.html"
+      ]
+    },
+    {
       "id": "nz",
       "name": "New Zealand",
       "document": "passport",
