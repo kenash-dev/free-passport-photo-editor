@@ -1,5 +1,6 @@
 import { useEffect, useMemo, useState } from 'react';
 import { CountrySelect } from './components/CountrySelect';
+import { Faq, Hero, HowItWorks, PrivacyNote, SiteFooter, SiteHeader } from './components/Landing';
 import { PhotoInput } from './components/PhotoInput';
 import { RequirementsPanel } from './components/RequirementsPanel';
 import { ResultView } from './components/ResultView';
@@ -104,63 +105,65 @@ export default function App() {
 
   return (
     <div className="app">
-      <header className="app-head">
-        <h1>Passport Photo Maker</h1>
-        <p className="muted">Everything runs in your browser. Your photo is never uploaded.</p>
-      </header>
+      <SiteHeader />
+      <Hero />
 
-      <div className="layout">
-        <main className="workspace">
-          <PhotoInput previewUrl={photo?.url ?? null} onFiles={onFiles} onClear={clearPhoto} />
-          {uploadError && <p className="error">{uploadError}</p>}
-          {photo?.warnings.map((w) => (
-            <p key={w} className="warning">
-              {w}
-            </p>
-          ))}
+      <section className="maker" id="maker" aria-labelledby="maker-title">
+        <h2 id="maker-title">Make your photo</h2>
+        <div className="layout">
+          <main className="workspace">
+            <PhotoInput previewUrl={photo?.url ?? null} onFiles={onFiles} onClear={clearPhoto} />
+            {uploadError && <p className="error">{uploadError}</p>}
+            {photo?.warnings.map((w) => (
+              <p key={w} className="warning">
+                {w}
+              </p>
+            ))}
 
-          <CountrySelect value={countryId} onChange={setCountryId} />
+            <CountrySelect value={countryId} onChange={setCountryId} />
 
-          <div className="process">
-            <button type="button" className="btn btn-primary" disabled={!photo || !country || processing} onClick={process}>
-              {processing ? 'Processing…' : 'Process photo'}
-            </button>
-            {!photo && <span className="muted small">Upload a photo first.</span>}
-            {photo && !country && <span className="muted small">Select a country.</span>}
-            {stale && <span className="muted small">Country changed. Press Process to redo the photo.</span>}
-          </div>
-          {processError && <p className="error">{processError}</p>}
+            <div className="process">
+              <button type="button" className="btn btn-primary" disabled={!photo || !country || processing} onClick={process}>
+                {processing ? 'Processing…' : 'Process photo'}
+              </button>
+              {!photo && <span className="muted small">Upload a photo first.</span>}
+              {photo && !country && <span className="muted small">Select a country.</span>}
+              {stale && <span className="muted small">Country changed. Press Process to redo the photo.</span>}
+            </div>
+            {processError && <p className="error">{processError}</p>}
 
-          {result && !result.canvas && (
-            <ul className="checks">
-              {result.checks.map((c) => (
-                <li key={c.text} className={`c-${c.level}`}>
-                  <span className="c-icon">✕</span>
-                  {c.text}
-                </li>
-              ))}
-            </ul>
-          )}
-          {result?.canvas && country && photo && faces && (
-            <ResultView
-              country={country}
-              bitmap={photo.bitmap}
-              face={faces[0]}
-              layout={result.layout}
-              canvas={result.canvas}
-              checks={result.checks}
-              adjust={adjust}
-              onAdjust={setAdjust}
-            />
-          )}
-        </main>
+            {result && !result.canvas && (
+              <ul className="checks">
+                {result.checks.map((c) => (
+                  <li key={c.text} className={`c-${c.level}`}>
+                    <span className="c-icon">✕</span>
+                    {c.text}
+                  </li>
+                ))}
+              </ul>
+            )}
+            {result?.canvas && country && photo && faces && (
+              <ResultView
+                country={country}
+                bitmap={photo.bitmap}
+                face={faces[0]}
+                layout={result.layout}
+                canvas={result.canvas}
+                checks={result.checks}
+                adjust={adjust}
+                onAdjust={setAdjust}
+              />
+            )}
+          </main>
 
-        <RequirementsPanel country={country} />
-      </div>
+          <RequirementsPanel country={country} />
+        </div>
+      </section>
 
-      <footer className="app-foot muted small">
-        Sizes come from each government's official guidance (see the sources). The app can't guarantee acceptance, so check the result against the rules before you submit it.
-      </footer>
+      <HowItWorks />
+      <PrivacyNote />
+      <Faq />
+      <SiteFooter />
     </div>
   );
 }

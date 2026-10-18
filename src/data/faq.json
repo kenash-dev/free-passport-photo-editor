@@ -1,0 +1,26 @@
+[
+  {
+    "q": "Is this passport photo maker really free?",
+    "a": "Yes. There is no sign-up, no watermark and no paid download. You get the print-ready photo, the digital photo for online forms and a print sheet at no cost."
+  },
+  {
+    "q": "Is my photo uploaded to a server?",
+    "a": "No. Face detection, cropping and resizing all run in your browser on your own device. The photo is never sent anywhere, and it is gone when you close or refresh the tab. You can check this in the source code on GitHub."
+  },
+  {
+    "q": "Which passport photo sizes are supported?",
+    "a": "United States passport (2 × 2 in, 51 × 51 mm), United Kingdom passport (35 × 45 mm), Australia passport (35 × 45 mm), New Zealand passport (digital, 900 × 1200 to 4500 × 6000 px), India passport (630 × 810 px, 35 × 45 mm print) and India OCI card (51 × 51 mm). Each size comes from the government's official guidance, linked next to the requirements."
+  },
+  {
+    "q": "How does the tool size my head correctly?",
+    "a": "It finds your face and the top of your head, levels your eyes, then scales and crops the photo so the chin-to-crown height and eye line fall inside the range the country allows. Guides on the preview show the allowed range, and you can drag the photo or adjust the head size within that range."
+  },
+  {
+    "q": "How do I print the photo at the right size?",
+    "a": "Download the print photo or a print sheet (4 × 6 in, 5 × 7 in, A4 or US Letter) and print it at 100% or \"actual size\", not \"fit to page\". The files carry the correct DPI, so photo labs print them at the true size."
+  },
+  {
+    "q": "Will the passport office accept my photo?",
+    "a": "The tool matches the official size and head position, but acceptance also depends on lighting, background, expression and glasses. Read the requirements shown for your country before you submit."
+  }
+]
