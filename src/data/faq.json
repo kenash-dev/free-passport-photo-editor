@@ -13,7 +13,7 @@
   },
   {
     "q": "How does the tool size my head correctly?",
-    "a": "It finds your face and the top of your head, levels your eyes, then scales and crops the photo so the chin-to-crown height and eye line fall inside the range the country allows. Guides on the preview show the allowed range, and you can drag the photo or adjust the head size within that range."
+    "a": "It finds your face and the top of your head, replaces the background with the colour the country requires, levels your eyes, then scales and crops the photo so the chin-to-crown height and eye line fall inside the range the country allows. Guides on the preview show the allowed range, and you can drag the photo or adjust the head size within that range."
   },
   {
     "q": "How do I print the photo at the right size?",

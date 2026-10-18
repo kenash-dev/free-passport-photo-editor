@@ -103,7 +103,7 @@ export function Hero() {
 const STEPS = [
   { title: 'Add one photo', body: 'Use a front-facing photo against a plain wall, with some space above your head. JPEG, PNG or WebP up to 20 MB.' },
   { title: 'Choose the country', body: 'The official size, head height and background rules for that passport appear next to the tool, with links to the source.' },
-  { title: 'Press Process photo', body: 'Your face and the top of your head are found, your eyes are levelled, and the photo is scaled and cropped to the allowed head size.' },
+  { title: 'Press Process photo', body: 'Your face is found, the background is replaced with the required colour, your eyes are levelled, and the photo is scaled and cropped to the allowed head size.' },
   { title: 'Download and print', body: 'Save the print photo at the right DPI, a digital copy for online forms, or a sheet of copies for 4 × 6 in, 5 × 7 in, A4 or Letter paper.' },
 ];
 

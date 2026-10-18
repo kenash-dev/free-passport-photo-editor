@@ -7,6 +7,7 @@ import { ResultView } from './components/ResultView';
 import { getCountry } from './data/countries';
 import { type Adjust, NO_ADJUST, checkResult, computeLayout, digitalFrame, printFrame, render } from './lib/compose';
 import { type FaceInfo, detectFaces, getLandmarker } from './lib/face';
+import { segmentPerson } from './lib/segment';
 import { type LoadedPhoto, UploadError, loadPhoto } from './lib/upload';
 
 const COUNTRY_KEY = 'passport-photo:last-country';
@@ -30,6 +31,9 @@ export default function App() {
   const [processing, setProcessing] = useState(false);
   const [processError, setProcessError] = useState<string | null>(null);
   const [adjust, setAdjust] = useState<Adjust>(NO_ADJUST);
+  /** Person mask for the current photo; null if segmentation hasn't run or failed. */
+  const [mask, setMask] = useState<HTMLCanvasElement | null>(null);
+  const [replaceBg, setReplaceBg] = useState(true);
   const country = getCountry(countryId);
 
   useEffect(() => {
@@ -58,6 +62,7 @@ export default function App() {
       const loaded = await loadPhoto(files);
       setPhoto(loaded);
       setFaces(null);
+      setMask(null);
       setProcessedFor(null);
       setProcessError(null);
       setAdjust(NO_ADJUST);
@@ -70,6 +75,7 @@ export default function App() {
   function clearPhoto() {
     setPhoto(null);
     setFaces(null);
+    setMask(null);
     setProcessedFor(null);
     setUploadError(null);
     setProcessError(null);
@@ -80,8 +86,13 @@ export default function App() {
     setProcessing(true);
     setProcessError(null);
     try {
-      const found = faces ?? (await detectFaces(photo.bitmap));
+      const [found, personMask] = await Promise.all([
+        faces ?? detectFaces(photo.bitmap),
+        // Background replacement is optional: if the model fails, keep the original background.
+        mask ?? segmentPerson(photo.bitmap).catch((e) => (console.error(e), null)),
+      ]);
       setFaces(found);
+      setMask(personMask);
       setAdjust(NO_ADJUST);
       setProcessedFor(country.id);
     } catch (e) {
@@ -97,9 +108,10 @@ export default function App() {
     if (!photo || !country || !faces || processedFor !== country.id || !frame) return null;
     if (faces.length !== 1) return { checks: checkResult(faces, null) };
     const layout = computeLayout(country, faces[0], frame, adjust, photo.bitmap);
-    const canvas = render(photo.bitmap, layout, country.background.color, !faces[0].crownCut);
-    return { layout, canvas, checks: checkResult(faces, layout) };
-  }, [photo, country, faces, processedFor, adjust]);
+    const useMask = replaceBg ? mask : null;
+    const canvas = render(photo.bitmap, layout, country.background.color, !faces[0].crownCut, useMask);
+    return { layout, canvas, checks: checkResult(faces, layout, !!useMask) };
+  }, [photo, country, faces, processedFor, adjust, mask, replaceBg]);
 
   const stale = !!faces && processedFor !== countryId;
 
@@ -152,6 +164,9 @@ export default function App() {
                 checks={result.checks}
                 adjust={adjust}
                 onAdjust={setAdjust}
+                mask={mask}
+                replaceBg={replaceBg}
+                onReplaceBg={setReplaceBg}
               />
             )}
           </main>

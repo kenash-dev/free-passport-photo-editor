@@ -13,6 +13,9 @@ interface Props {
   checks: Check[];
   adjust: Adjust;
   onAdjust: (a: Adjust) => void;
+  mask: HTMLCanvasElement | null;
+  replaceBg: boolean;
+  onReplaceBg: (on: boolean) => void;
 }
 
 const ICON = { pass: '✓', warn: '!', fail: '✕' };
@@ -31,7 +34,7 @@ function Slider(props: { label: string; value: number; min: number; max: number;
   );
 }
 
-export function ResultView({ country, bitmap, face, layout, canvas, checks, adjust, onAdjust }: Props) {
+export function ResultView({ country, bitmap, face, layout, canvas, checks, adjust, onAdjust, mask, replaceBg, onReplaceBg }: Props) {
   const [guides, setGuides] = useState(true);
   const [paperId, setPaperId] = useState('4x6');
   const [busy, setBusy] = useState<string | null>(null);
@@ -123,6 +126,12 @@ export function ResultView({ country, bitmap, face, layout, canvas, checks, adju
           <label className="check">
             <input type="checkbox" checked={guides} onChange={(e) => setGuides(e.target.checked)} /> Show guides
           </label>
+          {mask && (
+            <label className="check">
+              <input type="checkbox" checked={replaceBg} onChange={(e) => onReplaceBg(e.target.checked)} /> Replace background
+              <span className="swatch" style={{ background: country.background.color }} title={country.background.allowed.join(', ')} />
+            </label>
+          )}
         </div>
 
         <div className="result-side">
@@ -181,7 +190,7 @@ export function ResultView({ country, bitmap, face, layout, canvas, checks, adju
                 onClick={() =>
                   run('digital', async () => {
                     const l = computeLayout(country, face, digital, adjust, bitmap);
-                    const c = render(bitmap, l, country.background.color, !face.crownCut);
+                    const c = render(bitmap, l, country.background.color, !face.crownCut, replaceBg ? mask : null);
                     const blob = await encodeJpeg(c, { sizeKB: country.digital?.fileKB, maxKB: country.appDefaults.maxExportKB });
                     download(blob, `passport-photo-${tag}-${digital.widthPx}x${digital.heightPx}px.jpg`);
                   })

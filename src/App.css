@@ -143,7 +143,8 @@ select:hover { border-color: var(--ink-soft); }
 .g-eye { fill: rgba(27, 43, 68, 0.14); }
 .g-line { stroke: var(--pass); stroke-width: 2px; vector-effect: non-scaling-stroke; }
 .g-dash { stroke-dasharray: 6 4; stroke: var(--stamp); }
-.check { display: flex; gap: 6px; align-items: center; font-size: 0.9rem; }
+.check { display: flex; gap: 6px; align-items: center; font-size: 0.9rem; margin-top: 4px; }
+.swatch { width: 14px; height: 14px; border-radius: 3px; border: 1px solid var(--ink-soft); }
 
 .checks { list-style: none; margin: 0; padding: 0; display: flex; flex-direction: column; gap: 6px; font-size: 0.95rem; }
 .checks li { display: flex; gap: 8px; align-items: baseline; }

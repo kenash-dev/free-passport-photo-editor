@@ -46,10 +46,11 @@ The tool matches the official size and head position, but acceptance also depend
 1. **Reading the photo.** The file is checked (one photo, supported format, under 20 MB) and decoded in the browser with its orientation corrected.
 2. **Finding the face.** [MediaPipe Face Landmarker](https://ai.google.dev/edge/mediapipe/solutions/vision/face_landmarker) runs locally through WebAssembly and finds 478 points on the face, including the eyes and chin. It also flags closed eyes, an open mouth or a turned head.
 3. **Finding the top of the head.** The top of the hair isn't a face landmark, so the app walks up from the forehead until the pixels match the background beside the head. If it can't tell (for example, on a busy background), it estimates from the eye-to-chin distance.
-4. **Fitting the country's rules.** The photo is rotated so the eyes are level, then scaled so the chin-to-crown height lands in the middle of the allowed range, and positioned on the required eye line or top margin. If the frame reaches past the edge of your photo, the photo's own background is extended to fill it.
-5. **Exporting.** The result is drawn from your full-resolution photo. Print files get the correct DPI written into the JPEG so photo labs print them at true size, and digital files are compressed to fit each country's file-size limits.
+4. **Replacing the background.** MediaPipe's selfie segmentation model (also served from the site) separates you from the background, which is replaced with the colour the country requires. You can switch this off if you prefer your original background.
+5. **Fitting the country's rules.** The photo is rotated so the eyes are level, then scaled so the chin-to-crown height lands in the middle of the allowed range, and positioned on the required eye line or top margin. If the frame reaches past the edge of your photo, the photo's own background is extended to fill it.
+6. **Exporting.** The result is drawn from your full-resolution photo. Print files get the correct DPI written into the JPEG so photo labs print them at true size, and digital files are compressed to fit each country's file-size limits.
 
-The code for these steps is in [`src/lib/`](src/lib): `upload.ts`, `face.ts`, `compose.ts` and `export.ts`.
+The code for these steps is in [`src/lib/`](src/lib): `upload.ts`, `face.ts`, `segment.ts`, `compose.ts` and `export.ts`.
 
 ## Run it on your own computer
 
@@ -101,9 +102,10 @@ src/
   data/faq.json           FAQ text (also used for search-engine structured data)
   lib/upload.ts           file checks and decoding
   lib/face.ts             face landmarks and top-of-head detection
+  lib/segment.ts          person segmentation for background replacement
   lib/compose.ts          cropping, scaling and the checks shown to the user
   lib/export.ts           JPEG export with DPI, file-size targets and print sheets
-public/models/            face detection model, served with the site
+public/models/            face detection and segmentation models, served with the site
 scripts/copy-mediapipe.mjs  copies the WebAssembly runtime into public/
 ```
 

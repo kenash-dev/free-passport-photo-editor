@@ -148,7 +148,13 @@ export function computeLayout(c: CountrySpec, face: FaceInfo, frame: Frame, adju
  * photo, the photo's own edge pixels are stretched outwards so a plain background continues;
  * if the head touches the top edge, the country's background colour is used there instead.
  */
-export function render(bitmap: ImageBitmap, layout: Layout, background: string, extendTop = true): HTMLCanvasElement {
+export function render(
+  bitmap: ImageBitmap,
+  layout: Layout,
+  background: string,
+  extendTop = true,
+  personMask: HTMLCanvasElement | null = null,
+): HTMLCanvasElement {
   const { frame } = layout;
   const canvas = document.createElement('canvas');
   canvas.width = frame.widthPx;
@@ -180,7 +186,38 @@ export function render(bitmap: ImageBitmap, layout: Layout, background: string, 
     ctx.fillRect(-B, -B, W + 2 * B, B);
   }
   ctx.drawImage(bitmap, 0, 0);
+  if (personMask) replaceBackground(canvas, layout, personMask, W, H, background);
   return canvas;
+}
+
+/**
+ * Keeps only the person (from a segmentation mask covering the whole photo) and puts the
+ * country's background colour behind them. The body is assumed to continue below the photo.
+ */
+function replaceBackground(canvas: HTMLCanvasElement, layout: Layout, mask: HTMLCanvasElement, W: number, H: number, background: string) {
+  const m = document.createElement('canvas');
+  m.width = canvas.width;
+  m.height = canvas.height;
+  const mctx = m.getContext('2d')!;
+  mctx.imageSmoothingEnabled = true;
+  mctx.imageSmoothingQuality = 'high';
+  mctx.translate(layout.eyeOut.x, layout.eyeOut.y);
+  mctx.scale(layout.scale, layout.scale);
+  mctx.rotate(-layout.angle);
+  mctx.translate(-layout.eyeMid.x, -layout.eyeMid.y);
+  const B = 4 * Math.max(W, H);
+  mctx.drawImage(mask, 0, mask.height - 1, mask.width, 1, 0, H, W, B);
+  mctx.drawImage(mask, 0, 0, W, H);
+
+  const ctx = canvas.getContext('2d')!;
+  ctx.save();
+  ctx.setTransform(1, 0, 0, 1, 0, 0);
+  ctx.globalCompositeOperation = 'destination-in';
+  ctx.drawImage(m, 0, 0);
+  ctx.globalCompositeOperation = 'destination-over';
+  ctx.fillStyle = background;
+  ctx.fillRect(0, 0, canvas.width, canvas.height);
+  ctx.restore();
 }
 
 export type CheckLevel = 'pass' | 'warn' | 'fail';
@@ -191,7 +228,7 @@ export interface Check {
 
 const round1 = (n: number) => Math.round(n * 10) / 10;
 
-export function checkResult(faces: FaceInfo[], layout: Layout | null): Check[] {
+export function checkResult(faces: FaceInfo[], layout: Layout | null, backgroundReplaced = false): Check[] {
   if (faces.length === 0) return [{ level: 'fail', text: 'No face found. Use a clear, front-facing photo of one person.' }];
   if (faces.length > 1) return [{ level: 'fail', text: 'More than one face found. Use a photo with only you in it.' }];
   const checks: Check[] = [{ level: 'pass', text: 'One face found' }];
@@ -231,10 +268,13 @@ export function checkResult(faces: FaceInfo[], layout: Layout | null): Check[] {
     } else if (layout.crownEstimated) {
       checks.push({ level: 'warn', text: 'Couldn’t find the top of the head against the background, so it is estimated. Check the dashed line sits on top of your hair.' });
     }
-    if (layout.missingEdges.length) {
+    if (backgroundReplaced) checks.push({ level: 'pass', text: 'Background replaced with the required colour' });
+    // With a new background, only a missing bottom (cut-off shoulders) is visible in the result.
+    const missing = backgroundReplaced ? layout.missingEdges.filter((e) => e === 'bottom') : layout.missingEdges;
+    if (missing.length) {
       checks.push({
         level: 'warn',
-        text: `The photo doesn't reach the ${layout.missingEdges.join(' and ')} of the frame, so its background was extended. Check the edges look natural, or drag the photo.`,
+        text: `The photo doesn't reach the ${missing.join(' and ')} of the frame, so it was extended. Check the edges look natural, or drag the photo.`,
       });
     }
   }
