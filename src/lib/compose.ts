@@ -2,10 +2,10 @@ import { type CountrySpec, type Range, digitalSize, printSize } from '../data/co
 import type { FaceInfo, Point } from './face';
 
 /**
- * Crown (top of head, including hair) is not a landmark, so it is estimated from the
- * eye-to-chin distance: on adults the eyes sit close to the middle of the head height.
+ * Fallback when the top of the head can't be found in the photo: on adults the eyes sit
+ * close to the middle of the head height, so eye-to-crown is about eye-to-chin.
  */
-export const CROWN_FACTOR = 1.05;
+export const CROWN_FACTOR = 1.0;
 const DEFAULT_DPI = 600;
 const TOP_MARGIN_SHARE = 0.45;
 
@@ -41,6 +41,8 @@ export interface Layout {
   eyeFromBottomMm: number;
   eyeRangeMm: Range | null;
   missingEdges: string[];
+  /** True when the crown came from head proportions rather than from the photo. */
+  crownEstimated: boolean;
 }
 
 const mid = (r: Range): number | null => (r[0] != null && r[1] != null ? (r[0] + r[1]) / 2 : r[0] ?? r[1]);
@@ -85,11 +87,14 @@ export function computeLayout(c: CountrySpec, face: FaceInfo, frame: Frame, adju
   const eyeMid = { x: (eL.x + eR.x) / 2, y: (eL.y + eR.y) / 2 };
   const down = { x: -Math.sin(angle), y: Math.cos(angle) };
   const eyeToChinSrc = (face.chin.x - eyeMid.x) * down.x + (face.chin.y - eyeMid.y) * down.y;
-  const headSrc = eyeToChinSrc * (1 + CROWN_FACTOR);
+  const up = { x: -down.x, y: -down.y };
+  const measured = face.crown ? ((face.crown.x - eyeMid.x) * up.x + (face.crown.y - eyeMid.y) * up.y) / eyeToChinSrc : null;
+  const crownFactor = measured ?? CROWN_FACTOR;
+  const headSrc = eyeToChinSrc * (1 + crownFactor);
 
   const targetHeadMm = headRangeMm(c, frame.heightMm);
   const headMmWanted = ((targetHeadMm[0] + targetHeadMm[1]) / 2) * adjust.size;
-  const eyeToCrownMm = (headMmWanted * CROWN_FACTOR) / (1 + CROWN_FACTOR);
+  const eyeToCrownMm = (headMmWanted * crownFactor) / (1 + crownFactor);
 
   const eyeRangeMm = c.eyeLine.fromBottomMm ?? c.appDefaults.eyeLineFromBottomMm ?? null;
   const eyeFromBottomDefault = eyeRangeMm
@@ -103,7 +108,7 @@ export function computeLayout(c: CountrySpec, face: FaceInfo, frame: Frame, adju
     y: frame.heightPx - eyeFromBottomMm * frame.pxPerMm,
   };
   const chinY = eyeOut.y + eyeToChinSrc * scale;
-  const crownY = eyeOut.y - eyeToChinSrc * CROWN_FACTOR * scale;
+  const crownY = eyeOut.y - eyeToChinSrc * crownFactor * scale;
 
   // Map the output corners back into the photo to see whether any edge falls outside it.
   const toSrc = (x: number, y: number): Point => {
@@ -134,11 +139,16 @@ export function computeLayout(c: CountrySpec, face: FaceInfo, frame: Frame, adju
     eyeFromBottomMm,
     eyeRangeMm,
     missingEdges,
+    crownEstimated: measured == null,
   };
 }
 
-/** Draws the photo rotated, scaled and cropped into the frame, over the country's background colour. */
-export function render(bitmap: ImageBitmap, layout: Layout, background: string): HTMLCanvasElement {
+/**
+ * Draws the photo rotated, scaled and cropped into the frame. Where the frame reaches past the
+ * photo, the photo's own edge pixels are stretched outwards so a plain background continues;
+ * if the head touches the top edge, the country's background colour is used there instead.
+ */
+export function render(bitmap: ImageBitmap, layout: Layout, background: string, extendTop = true): HTMLCanvasElement {
   const { frame } = layout;
   const canvas = document.createElement('canvas');
   canvas.width = frame.widthPx;
@@ -152,6 +162,23 @@ export function render(bitmap: ImageBitmap, layout: Layout, background: string):
   ctx.scale(layout.scale, layout.scale);
   ctx.rotate(-layout.angle);
   ctx.translate(-layout.eyeMid.x, -layout.eyeMid.y);
+  const W = bitmap.width;
+  const H = bitmap.height;
+  const B = 4 * Math.max(W, H);
+  const e = Math.min(3, W, H);
+  ctx.drawImage(bitmap, 0, H - e, W, e, 0, H, W, B);
+  ctx.drawImage(bitmap, 0, 0, e, H, -B, 0, B, H);
+  ctx.drawImage(bitmap, W - e, 0, e, H, W, 0, B, H);
+  ctx.drawImage(bitmap, 0, H - e, e, e, -B, H, B, B);
+  ctx.drawImage(bitmap, W - e, H - e, e, e, W, H, B, B);
+  if (extendTop) {
+    ctx.drawImage(bitmap, 0, 0, W, e, 0, -B, W, B);
+    ctx.drawImage(bitmap, 0, 0, e, e, -B, -B, B, B);
+    ctx.drawImage(bitmap, W - e, 0, e, e, W, -B, B, B);
+  } else {
+    ctx.fillStyle = background;
+    ctx.fillRect(-B, -B, W + 2 * B, B);
+  }
   ctx.drawImage(bitmap, 0, 0);
   return canvas;
 }
@@ -199,10 +226,15 @@ export function checkResult(faces: FaceInfo[], layout: Layout | null): Check[] {
     if (layout.scale > 1.05) {
       checks.push({ level: 'warn', text: 'The face is small in this photo, so it was enlarged and may look soft. Move closer or use a sharper photo.' });
     }
+    if (face.crownCut) {
+      checks.push({ level: 'warn', text: 'The top of the head is cut off in this photo, so head height is estimated. Use a photo with space above your hair.' });
+    } else if (layout.crownEstimated) {
+      checks.push({ level: 'warn', text: 'Couldn’t find the top of the head against the background, so it is estimated. Check the dashed line sits on top of your hair.' });
+    }
     if (layout.missingEdges.length) {
       checks.push({
         level: 'warn',
-        text: `The photo doesn't reach the ${layout.missingEdges.join(' and ')} of the frame; that area was filled with the background colour. Leave more space around your head.`,
+        text: `The photo doesn't reach the ${layout.missingEdges.join(' and ')} of the frame, so its background was extended. Check the edges look natural, or drag the photo.`,
       });
     }
   }

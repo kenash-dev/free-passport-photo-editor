@@ -96,7 +96,7 @@ export default function App() {
     if (!photo || !country || !faces || processedFor !== country.id || !frame) return null;
     if (faces.length !== 1) return { checks: checkResult(faces, null) };
     const layout = computeLayout(country, faces[0], frame, adjust, photo.bitmap);
-    const canvas = render(photo.bitmap, layout, country.background.color);
+    const canvas = render(photo.bitmap, layout, country.background.color, !faces[0].crownCut);
     return { layout, canvas, checks: checkResult(faces, layout) };
   }, [photo, country, faces, processedFor, adjust]);
 

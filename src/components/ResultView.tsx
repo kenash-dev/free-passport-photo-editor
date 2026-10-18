@@ -1,4 +1,4 @@
-import { useMemo, useState } from 'react';
+import { useMemo, useRef, useState } from 'react';
 import { type CountrySpec } from '../data/countries';
 import { type Adjust, type Check, type Layout, digitalFrame, computeLayout, render } from '../lib/compose';
 import type { FaceInfo } from '../lib/face';
@@ -18,6 +18,7 @@ interface Props {
 const ICON = { pass: '✓', warn: '!', fail: '✕' };
 // 300 DPI keeps A4/Letter sheets under mobile Safari's canvas size limit.
 const SHEET_DPI = 300;
+const MAX_MOVE_MM = 10;
 
 function Slider(props: { label: string; value: number; min: number; max: number; step: number; fmt: (v: number) => string; onChange: (v: number) => void }) {
   return (
@@ -48,6 +49,18 @@ export function ResultView({ country, bitmap, face, layout, canvas, checks, adju
   const band = { top: layout.chinY - hi * frame.pxPerMm, bottom: layout.chinY - lo * frame.pxPerMm };
   const eye = layout.eyeRangeMm;
 
+  // Head size can only move inside the country's allowed range.
+  const midHead = (lo + hi) / 2;
+  const sizeMin = lo / midHead;
+  const sizeMax = hi / midHead;
+  const clampSize = (v: number) => Math.min(sizeMax, Math.max(sizeMin, v));
+  const clampMove = (v: number) => Math.min(MAX_MOVE_MM, Math.max(-MAX_MOVE_MM, Math.round(v * 4) / 4));
+
+  // Drag the photo to move it.
+  const frameRef = useRef<HTMLDivElement>(null);
+  const drag = useRef<{ x: number; y: number; start: Adjust } | null>(null);
+  const screenPxPerMm = () => (frameRef.current?.clientWidth ?? 1) / frame.widthMm;
+
   async function run(label: string, fn: () => Promise<void>) {
     setBusy(label);
     setError(null);
@@ -67,8 +80,25 @@ export function ResultView({ country, bitmap, face, layout, canvas, checks, adju
     <section className="result">
       <div className="result-grid">
         <div>
-          <div className="photo-frame" style={{ aspectRatio: `${frame.widthPx} / ${frame.heightPx}` }}>
-            <img src={previewUrl} alt="Passport photo result" />
+          <div
+            ref={frameRef}
+            className="photo-frame"
+            style={{ aspectRatio: `${frame.widthPx} / ${frame.heightPx}` }}
+            title="Drag to move the photo"
+            onPointerDown={(e) => {
+              e.currentTarget.setPointerCapture(e.pointerId);
+              drag.current = { x: e.clientX, y: e.clientY, start: adjust };
+            }}
+            onPointerMove={(e) => {
+              const d = drag.current;
+              if (!d) return;
+              const k = screenPxPerMm();
+              onAdjust({ ...d.start, dxMm: clampMove(d.start.dxMm + (e.clientX - d.x) / k), dyMm: clampMove(d.start.dyMm + (e.clientY - d.y) / k) });
+            }}
+            onPointerUp={() => (drag.current = null)}
+            onPointerCancel={() => (drag.current = null)}
+          >
+            <img src={previewUrl} alt="Passport photo result" draggable={false} />
             {guides && (
               <svg viewBox={`0 0 ${frame.widthPx} ${frame.heightPx}`} preserveAspectRatio="none" aria-hidden>
                 <rect x={0} y={band.top} width={frame.widthPx} height={band.bottom - band.top} className="g-band" />
@@ -111,9 +141,18 @@ export function ResultView({ country, bitmap, face, layout, canvas, checks, adju
           )}
 
           <h3>Fine-tune</h3>
-          <Slider label="Head size" value={adjust.size} min={0.85} max={1.15} step={0.01} fmt={(v) => `${Math.round(v * 100)}%`} onChange={(size) => onAdjust({ ...adjust, size })} />
-          <Slider label="Move up / down" value={adjust.dyMm} min={-6} max={6} step={0.25} fmt={(v) => `${v > 0 ? '+' : ''}${v} mm`} onChange={(dyMm) => onAdjust({ ...adjust, dyMm })} />
-          <Slider label="Move left / right" value={adjust.dxMm} min={-6} max={6} step={0.25} fmt={(v) => `${v > 0 ? '+' : ''}${v} mm`} onChange={(dxMm) => onAdjust({ ...adjust, dxMm })} />
+          <p className="muted small">Drag the photo to move it. Head size stays within the allowed {lo.toFixed(1)}–{hi.toFixed(1)} mm.</p>
+          <Slider
+            label="Head size"
+            value={clampSize(adjust.size)}
+            min={sizeMin}
+            max={sizeMax}
+            step={0.005}
+            fmt={(v) => `${(midHead * v).toFixed(1)} mm`}
+            onChange={(size) => onAdjust({ ...adjust, size })}
+          />
+          <Slider label="Move up / down" value={adjust.dyMm} min={-MAX_MOVE_MM} max={MAX_MOVE_MM} step={0.25} fmt={(v) => `${v > 0 ? '+' : ''}${v} mm`} onChange={(dyMm) => onAdjust({ ...adjust, dyMm })} />
+          <Slider label="Move left / right" value={adjust.dxMm} min={-MAX_MOVE_MM} max={MAX_MOVE_MM} step={0.25} fmt={(v) => `${v > 0 ? '+' : ''}${v} mm`} onChange={(dxMm) => onAdjust({ ...adjust, dxMm })} />
           <button type="button" className="btn btn-link" onClick={() => onAdjust({ size: 1, dxMm: 0, dyMm: 0 })}>
             Reset
           </button>
@@ -142,7 +181,7 @@ export function ResultView({ country, bitmap, face, layout, canvas, checks, adju
                 onClick={() =>
                   run('digital', async () => {
                     const l = computeLayout(country, face, digital, adjust, bitmap);
-                    const c = render(bitmap, l, country.background.color);
+                    const c = render(bitmap, l, country.background.color, !face.crownCut);
                     const blob = await encodeJpeg(c, { sizeKB: country.digital?.fileKB, maxKB: country.appDefaults.maxExportKB });
                     download(blob, `passport-photo-${tag}-${digital.widthPx}x${digital.heightPx}px.jpg`);
                   })

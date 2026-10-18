@@ -78,7 +78,9 @@ dd { margin: 0; }
 @media (max-width: 600px) { .result-grid { grid-template-columns: 1fr; } }
 .result-side h3 { margin: 16px 0 8px; font-size: 0.8rem; text-transform: uppercase; letter-spacing: 0.04em; color: var(--muted); }
 
-.photo-frame { position: relative; width: 100%; border: 1px solid #c9ced6; }
+.photo-frame { position: relative; width: 100%; border: 1px solid #c9ced6; cursor: grab; touch-action: none; user-select: none; overscroll-behavior: contain; }
+.photo-frame:active { cursor: grabbing; }
+.photo-frame svg { pointer-events: none; }
 .photo-frame img, .photo-frame svg { position: absolute; inset: 0; width: 100%; height: 100%; }
 .g-band { fill: rgba(22, 163, 74, 0.18); }
 .g-eye { fill: rgba(37, 99, 235, 0.15); }
